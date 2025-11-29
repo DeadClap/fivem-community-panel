@@ -1,31 +1,28 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../primsa/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-
-export interface User {
-  id: string;
-  discordId: string;
-  discordUsername: string;
-  communityName?: string;
-}
+import { UserStatus } from '../../generated/prisma/enums';
 
 @Injectable()
 export class UsersService {
-  // TEMP: in-memory store until DB is wired
-  private users = new Map<string, User>();
-  private idCounter = 1;
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateUserDto): User {
-    const id = String(this.idCounter++);
-    const user: User = { id, ...dto };
-    this.users.set(id, user);
-    return user;
+  create(dto: CreateUserDto) {
+    return this.prisma.user.create({
+      data: {
+        discordId: dto.discordId,
+        discordUsername: dto.discordUsername,
+        communityName: dto.communityName ?? null,
+        status: UserStatus.INACTIVE,
+      },
+    });
   }
 
-  findAll(): User[] {
-    return Array.from(this.users.values());
+  findAll() {
+    return this.prisma.user.findMany();
   }
 
-  findOne(id: string): User | undefined {
-    return this.users.get(id);
+  findOne(id: string) {
+    return this.prisma.user.findUnique({ where: { id } });
   }
 }
