@@ -23,7 +23,7 @@ model User {
   loaUntil        DateTime?
 
   createdAt DateTime @default(now())
-  updatedAd DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 enum UserStatus {
