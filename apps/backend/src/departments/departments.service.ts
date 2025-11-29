@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 
 export interface Department {
@@ -9,17 +10,18 @@ export interface Department {
 
 @Injectable()
 export class DepartmentsService {
-  private departments = new Map<string, Department>();
-  private idCounter = 1;
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateDepartmentDto): Department {
-    const id = String(this.idCounter++);
-    const dept: Department = { id, ...dto };
-    this.departments.set(id, dept);
-    return dept;
+  create(dto: CreateDepartmentDto) {
+    return this.prisma.department.create({
+      data: {
+        name: dto.name,
+        code: dto.code,
+      },
+    });
   }
 
-  findAll(): Department[] {
-    return Array.from(this.departments.values());
+  findAll() {
+    return this.prisma.department.findMany();
   }
 }
