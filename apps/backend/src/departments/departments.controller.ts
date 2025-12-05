@@ -1,36 +1,19 @@
-// apps/backend/src/departments/departments.controller.ts
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
-import { Department } from '@prisma/client';
 
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Post()
-  create(@Body() dto: CreateDepartmentDto): Promise<Department> {
+  create(@Body() dto: CreateDepartmentDto) {
+    // No try/catch needed — Nest will handle Prisma exceptions correctly
     return this.departmentsService.create(dto);
   }
 
   @Get()
-  findAll(): Promise<Department[]> {
+  findAll() {
     return this.departmentsService.findAll();
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Department> {
-    const department = await this.departmentsService.findOne(id);
-    if (!department) {
-      throw new NotFoundException('Department not found');
-    }
-    return department;
   }
 }
