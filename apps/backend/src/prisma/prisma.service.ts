@@ -17,10 +17,10 @@ export class PrismaService
       throw new Error('DATABASE_URL is not set');
     }
 
-    this.pool = new Pool({ connectionString: url });
+    const pool = new Pool({ connectionString: url });
     const adapter = (() => {
       try {
-        return new PrismaPg(this.pool);
+        return new PrismaPg(pool);
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Unknown Prisma adapter error';
@@ -31,6 +31,8 @@ export class PrismaService
     super({
       adapter,
     });
+
+    this.pool = pool;
   }
 
   async onModuleInit() {
