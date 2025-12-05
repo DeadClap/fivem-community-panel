@@ -20,4 +20,8 @@ export class DepartmentsService {
   findAll(): Promise<Department[]> {
     return this.prisma.department.findMany();
   }
+
+  findOne(id: string): Promise<Department | null> {
+    return this.prisma.department.findUnique({ where: { id } });
+  }
 }
