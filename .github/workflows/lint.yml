@@ -19,12 +19,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: apps/backend/package-lock.json
 
       - name: Install backend dependencies
         run: npm ci
+
+      - name: "Generate Prisma client"
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://fake:fake@localhost:5432/fake"
 
       - name: Run backend lint
         run: npm run lint
@@ -42,8 +47,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install frontend dependencies
