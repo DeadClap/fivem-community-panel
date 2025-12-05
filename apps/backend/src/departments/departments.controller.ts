@@ -1,5 +1,12 @@
 // apps/backend/src/departments/departments.controller.ts
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { Department } from '@prisma/client';
@@ -19,7 +26,11 @@ export class DepartmentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Department | null> {
-    return this.departmentsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Department> {
+    const department = await this.departmentsService.findOne(id);
+    if (!department) {
+      throw new NotFoundException('Department not found');
+    }
+    return department;
   }
 }
