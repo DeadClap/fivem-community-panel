@@ -22,6 +22,10 @@ export class PrismaService
       try {
         return new PrismaPg(pool);
       } catch (err) {
+        // Close the pool before re-throwing to prevent resource leak
+        void pool.end().catch(() => {
+          // Ignore errors during cleanup
+        });
         const message =
           err instanceof Error ? err.message : 'Unknown Prisma adapter error';
         throw new Error(`Failed to initialize Prisma adapter: ${message}`);
