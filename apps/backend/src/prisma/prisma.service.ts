@@ -9,16 +9,18 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly pool: Pool;
+
   constructor() {
     const url = process.env.DATABASE_URL;
     if (!url) {
       throw new Error('DATABASE_URL is not set');
     }
 
-    const pool = new Pool({ connectionString: url });
+    this.pool = new Pool({ connectionString: url });
     const adapter = (() => {
       try {
-        return new PrismaPg(pool);
+        return new PrismaPg(this.pool);
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Unknown Prisma adapter error';
@@ -37,5 +39,6 @@ export class PrismaService
 
   async onModuleDestroy() {
     await this.$disconnect();
+    await this.pool.end();
   }
 }
