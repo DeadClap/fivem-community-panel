@@ -16,7 +16,15 @@ export class PrismaService
     }
 
     const pool = new Pool({ connectionString: url });
-    const adapter = new PrismaPg(pool);
+    const adapter = (() => {
+      try {
+        return new PrismaPg(pool);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Unknown Prisma adapter error';
+        throw new Error(`Failed to initialize Prisma adapter: ${message}`);
+      }
+    })();
 
     super({
       adapter,
