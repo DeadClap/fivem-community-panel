@@ -1,14 +1,12 @@
-// apps/backend/src/departments/departments.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
-import { Department } from '@prisma/client';
 
 @Injectable()
 export class DepartmentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateDepartmentDto): Promise<Department> {
+  create(dto: CreateDepartmentDto) {
     return this.prisma.department.create({
       data: {
         name: dto.name,
@@ -17,11 +15,7 @@ export class DepartmentsService {
     });
   }
 
-  findAll(): Promise<Department[]> {
+  findAll() {
     return this.prisma.department.findMany();
-  }
-
-  findOne(id: string): Promise<Department | null> {
-    return this.prisma.department.findUnique({ where: { id } });
   }
 }
