@@ -1,15 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "postgresql"
+}
 
 generator client {
   provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
 }
 
 model User {
@@ -20,6 +14,8 @@ model User {
   identifier      String?    @unique
   status          UserStatus @default(INACTIVE)
   loaUntil        DateTime?
+
+  memberships UserDepartmentMembership[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -35,8 +31,53 @@ enum UserStatus {
 model Department {
   id   String @id @default(cuid())
   name String @unique
-  code String @unique
+  code String @db.VarChar(8)
+
+  ranks       DepartmentRank[]
+  memberships UserDepartmentMembership[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model DepartmentRank {
+  id           String     @id @default(cuid())
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId String
+
+  name      String
+  shortCode String?  @db.VarChar(8)
+  level     Int // higher = more senior
+  band      RankBand @default(BASE)
+
+  memberships UserDepartmentMembership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId, level])
+}
+
+enum RankBand {
+  BASE
+  SUPERVISOR
+  LEADERSHIP
+  OWNER
+}
+
+model UserDepartmentMembership {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId String
+
+  rank   DepartmentRank @relation(fields: [rankId], references: [id])
+  rankId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, departmentId])
 }
